@@ -1,0 +1,39 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <SoftwareSerial.h>
+
+// Define LCD (Address: 0x27, Columns: 16, Rows: 2)
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Define Bluetooth RX and TX pins
+SoftwareSerial BT(10, 11); // RX, TX
+
+void setup() {
+    lcd.init(); // Initialize LCD
+    lcd.backlight(); // Turn on LCD backlight
+    lcd.setCursor(0, 0);
+    lcd.print(" Smart Notice ");
+    delay(2000);
+    lcd.clear();
+
+    BT.begin(9600); // Start Bluetooth communication
+}
+
+void loop() {
+    if (BT.available()) {  // Check if data is received
+        lcd.clear();
+        delay(100);
+        String message = ""; // Store incoming message
+        
+        while (BT.available()) {
+            char c = BT.read(); // Read character
+            message += c; // Append to message
+            delay(5);
+        }
+
+        lcd.setCursor(0, 0); // Set cursor position
+        lcd.print("Message: ");
+        lcd.setCursor(0, 1);
+        lcd.print(message); // Display message
+    }
+}
